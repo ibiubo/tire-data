@@ -326,13 +326,20 @@
         <option value="heat">熱ダレ耐性</option>
       </select>
 
+      <label>購入本数</label>
+      <select id="quantity">
+        <option value="1">1本</option>
+        <option value="2">2本</option>
+        <option value="4" selected>4本</option>
+      </select>
+
       <label>コスト上限</label>
       <select id="budget">
-        <option value="40000">4本 4万円以内</option>
-        <option value="60000">4本 6万円以内</option>
-        <option value="80000">4本 8万円以内</option>
-        <option value="100000">4本 10万円以内</option>
-        <option value="150000">4本 15万円以内</option>
+        <option value="40000">総額 4万円以内</option>
+        <option value="60000">総額 6万円以内</option>
+        <option value="80000">総額 8万円以内</option>
+        <option value="100000">総額 10万円以内</option>
+        <option value="150000">総額 15万円以内</option>
         <option value="200000">4本 20万円以内</option>
         <option value="999999">上限なし</option>
       </select>
@@ -519,7 +526,7 @@ function renderSearchHistory(){
     <div class="historyItem">
       <b>${h.date}</b><br>
       ${h.size} / ${h.use} / ${h.gripLabel}<br>
-      ${h.groupLabel} / ${h.twLabel} / 予算 ${h.budgetLabel}<br>
+      ${h.groupLabel} / ${h.twLabel} / ${h.qty||4}本 / 予算 ${h.budgetLabel}<br>
       結果：${h.top || "該当なし"}
       <br><button onclick="restoreSearchHistory(${i})">この条件で再検索</button>
     </div>
@@ -528,7 +535,7 @@ function renderSearchHistory(){
 function restoreSearchHistory(i){
   const h=searchHistories[i]; if(!h)return;
   searchUse.value=h.use; searchGrip.value=h.grip; makerGroup.value=h.group; twFilter.value=h.tw; priority.value=h.priority;
-  budget.value=h.budget; searchWidth.value=h.w; searchAspect.value=h.a; searchInch.value=h.inch;
+  budget.value=h.budget; if(h.qty) quantity.value=h.qty; searchWidth.value=h.w; searchAspect.value=h.a; searchInch.value=h.inch;
   searchTires(false);
 }
 function clearSearchHistory(){
@@ -553,6 +560,20 @@ function marketUrl(site,query){
   return "#";
 }
 
+
+function totalPrice(item, qty){
+  return Math.round((item.price / 4) * qty);
+}
+function priceRangeText(item, qty){
+  const low = Math.round(totalPrice(item, qty) * 0.92);
+  const high = Math.round(totalPrice(item, qty) * 1.08);
+  const each = Math.round(item.price / 4);
+  return {
+    low, high, each,
+    text:`${qty}本 約 ¥${low.toLocaleString()}〜¥${high.toLocaleString()}（1本目安 ¥${each.toLocaleString()}）`
+  };
+}
+
 function parseSizeStr(s){
   const m=String(s).match(/(\d+)\/(\d+)R(\d+)/);
   return m ? {w:Number(m[1]),a:Number(m[2]),i:Number(m[3])} : null;
@@ -571,7 +592,7 @@ function nearSizeMatch(item, targetSize){
 
 function searchTires(saveHistory=true){
   const use=searchUse.value, grip=searchGrip.value, group=makerGroup.value, tw=twFilter.value, pri=priority.value;
-  const size=`${searchWidth.value}/${searchAspect.value}R${searchInch.value}`, max=Number(budget.value);
+  const size=`${searchWidth.value}/${searchAspect.value}R${searchInch.value}`, max=Number(budget.value), qty=Number(quantity.value);
   const groupLabel={all:"すべて",domestic:"国産のみ",asian:"アジアンのみ",europe:"欧州のみ",america:"北米のみ"}[group];
   const gripLabel=searchGrip.options[searchGrip.selectedIndex].text;
   const twLabel=twFilter.options[twFilter.selectedIndex].text;
@@ -582,7 +603,7 @@ function searchTires(saveHistory=true){
     .filter(t=>t.matchInfo.match)
     .filter(t=>group==="all" ? true : t.group===group)
     .filter(t=>twMatch(t.tw,tw))
-    .filter(t=>t.price<=max)
+    .filter(t=>totalPrice(t, qty)<=max)
     .map(t=>{
       let score=0;
       if(t.uses.includes(use))score+=35;
@@ -593,7 +614,7 @@ function searchTires(saveHistory=true){
       if(pri==="wet") score+=t.rate.wet*5;
       if(pri==="life") score+=t.rate.life*5;
       if(pri==="heat") score+=t.rate.heat*5;
-      if(t.price<=max*0.8)score+=8;
+      if(totalPrice(t, qty)<=max*0.8)score+=8;
       return {...t,score,overall:overallRating(t,use,grip,pri)};
     })
     .filter(t=>t.score>25)
@@ -602,7 +623,7 @@ function searchTires(saveHistory=true){
   if(saveHistory){
     addSearchHistory({
       date:new Date().toLocaleDateString("ja-JP"),
-      use, grip, group, tw, priority:pri, budget:budget.value,
+      use, grip, group, tw, priority:pri, budget:budget.value, qty:quantity.value,
       w:searchWidth.value, a:searchAspect.value, inch:searchInch.value,
       size, gripLabel, groupLabel, twLabel, budgetLabel,
       top:results.slice(0,3).map(r=>r.name).join(" / ")
@@ -611,12 +632,12 @@ function searchTires(saveHistory=true){
 
   searchResults.innerHTML = results.length ? results.map((t,i)=>{
     const query=`${t.name} ${t.matchInfo.exact ? size : t.matchInfo.label} 新品 タイヤ`;
-    const cheapest=Math.round(t.price*0.92);
+    const priceInfo=priceRangeText(t, qty);
     return `<div class="card newTire">
       <div class="title"><span class="rankBadge">${i+1}</span>${t.name}</div>
       <div class="stars">${stars(t.overall)} <span class="small">${t.overall.toFixed(1)}/5</span></div>
-      <div class="meta">${t.matchInfo.exact ? size : "近いサイズ："+t.matchInfo.label+"（指定 "+size+"）"} / ${t.tw} / 想定相場 4本</div>
-      <div class="price">約 ¥${cheapest.toLocaleString()}〜</div>
+      <div class="meta">${t.matchInfo.exact ? size : "近いサイズ："+t.matchInfo.label+"（指定 "+size+"）"} / ${t.tw} / 新品 ${qty}本</div>
+      <div class="price">${priceInfo.text}</div>
       <span class="tag gold">${t.origin} / ${t.uses.join(" / ")}</span>
       <span class="tag good">予算内候補</span><span class="tag ${t.matchInfo.exact?'good':'warn'}">${t.matchInfo.exact?"サイズ一致":"近いサイズ"}</span>
       <div class="ratingGrid">
@@ -626,7 +647,7 @@ function searchTires(saveHistory=true){
         <div class="ratingItem"><b>コスパ</b> ${stars(t.rate.cost)}</div>
       </div>
       <ul class="featureList">${t.features.map(f=>`<li>${f}</li>`).join("")}</ul>
-      <div class="ai"><b style="color:var(--gold2)">選定コメント：</b>${use}用途で${gripLabel}を重視する場合の候補。${groupLabel}・${twLabel}・${budgetLabel}の条件で抽出。</div>
+      <div class="ai"><b style="color:var(--gold2)">選定コメント：</b>${use}用途で${gripLabel}を重視する場合の候補。${groupLabel}・${twLabel}・${budgetLabel}・${qty}本の条件で抽出。</div>
       <div class="marketLinks">
         <a target="_blank" href="${marketUrl("楽天",query)}">楽天で探す</a>
         <a target="_blank" href="${marketUrl("Yahoo",query)}">Yahooで探す</a>
@@ -643,7 +664,7 @@ function searchTires(saveHistory=true){
         </div>
       </div>
     </div>`;
-  }).join("") : `<div class="empty">条件に合う予算内候補がありません。予算・メーカー分類・TW指定を広げるか、近いサイズも含めて再検索してください。</div>`;
+  }).join("") : `<div class="empty">条件に合う予算内候補がありません。購入本数・予算・メーカー分類・TW指定を見直してください。</div>`;
 }
 
 fill();seed();render();renderSearchHistory();toggleCustomRegisterFields();
