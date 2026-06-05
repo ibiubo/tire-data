@@ -443,33 +443,36 @@ function deleteTire(id){if(confirm("このタイヤを削除しますか？")){t
 function showTab(id,btn){document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));document.getElementById(id).classList.add("active");document.querySelectorAll(".tab").forEach(t=>t.classList.remove("on"));if(btn)btn.classList.add("on");render()}
 
 const tireCatalog=[
-  {name:"YOKOHAMA ADVAN A052", maker:"YOKOHAMA", group:"domestic", origin:"国産", grip:"max", uses:["ジムカーナ","サーキット"], tw:"TW 200", price:128000, sizes:["195/50R15","205/50R15","215/45R17","225/45R17","235/40R17","245/40R17","255/40R17","265/35R18"], rate:{grip:5,wet:2,life:2,cost:2,heat:3}, features:["強烈な初期グリップ","ジムカーナや短時間アタック向き","価格は高めで摩耗も早め"]},
-  {name:"BRIDGESTONE POTENZA RE-71RS", maker:"BRIDGESTONE", group:"domestic", origin:"国産", grip:"max", uses:["ジムカーナ","サーキット"], tw:"TW 200", price:118000, sizes:["195/50R15","205/50R15","215/45R17","225/45R17","235/40R17","245/40R17","255/40R17","265/35R18"], rate:{grip:5,wet:3,life:2,cost:2,heat:3}, features:["縦横グリップが高い","温まりが早い","本番用として使いやすい"]},
-  {name:"DUNLOP DIREZZA ZⅢ", maker:"DUNLOP", group:"domestic", origin:"国産", grip:"high", uses:["ジムカーナ","サーキット","練習用"], tw:"TW 200", price:82000, sizes:["165/55R15","185/60R14","195/50R15","205/50R15","215/45R17","225/45R17","235/40R17","245/40R17","265/35R18"], rate:{grip:4,wet:3,life:3,cost:3,heat:4}, features:["扱いやすく練習から本番まで対応","価格と性能のバランスが良い","A052ほどの一発はないが安定"]},
-  {name:"YOKOHAMA ADVAN NEOVA AD09", maker:"YOKOHAMA", group:"domestic", origin:"国産", grip:"high", uses:["街乗り","サーキット","ジムカーナ"], tw:"TW 200", price:98000, sizes:["195/50R15","205/50R15","215/45R17","225/45R17","235/40R17","245/40R17","255/40R17","265/35R18"], rate:{grip:4,wet:4,life:3,cost:3,heat:3}, features:["街乗り兼スポーツに向く","ウェット性能も比較的良い","ライフとグリップのバランス型"]},
-  {name:"TOYO PROXES R1R", maker:"TOYO", group:"domestic", origin:"国産", grip:"high", uses:["ジムカーナ","練習用","雨用"], tw:"TW 200", price:72000, sizes:["185/60R14","195/50R15","205/50R15","215/45R17","225/45R17"], rate:{grip:4,wet:4,life:2,cost:4,heat:2}, features:["柔らかめで食いつき感が強い","雨や低温でも使いやすい","熱が入るとタレに注意"]},
+  {name:"YOKOHAMA ADVAN A052", maker:"YOKOHAMA", group:"domestic", origin:"国産", grip:"max", uses:["ジムカーナ","サーキット"], tw:"TW 200", price:128000, sizes:["195/50R15","205/50R15","195/50R16","205/45R16","205/50R16","225/45R16","215/45R17","225/45R17","235/40R17","245/40R17","255/40R17","265/35R18"], rate:{grip:5,wet:2,life:2,cost:2,heat:3}, features:["強烈な初期グリップ","ジムカーナや短時間アタック向き","価格は高めで摩耗も早め"]},
+  {name:"BRIDGESTONE POTENZA RE-71RS", maker:"BRIDGESTONE", group:"domestic", origin:"国産", grip:"max", uses:["ジムカーナ","サーキット"], tw:"TW 200", price:118000, sizes:["195/50R15","205/50R15","195/50R16","205/45R16","205/50R16","225/45R16","215/45R17","225/45R17","235/40R17","245/40R17","255/40R17","265/35R18"], rate:{grip:5,wet:3,life:2,cost:2,heat:3}, features:["縦横グリップが高い","温まりが早い","本番用として使いやすい"]},
+  {name:"DUNLOP DIREZZA ZⅢ", maker:"DUNLOP", group:"domestic", origin:"国産", grip:"high", uses:["ジムカーナ","サーキット","練習用"], tw:"TW 200", price:82000, sizes:["165/55R15","185/60R14","195/50R15","205/50R15","195/50R16","205/45R16","205/50R16","225/45R16","215/45R17","225/45R17","235/40R17","245/40R17","265/35R18"], rate:{grip:4,wet:3,life:3,cost:3,heat:4}, features:["扱いやすく練習から本番まで対応","価格と性能のバランスが良い","A052ほどの一発はないが安定"]},
+  {name:"YOKOHAMA ADVAN NEOVA AD09", maker:"YOKOHAMA", group:"domestic", origin:"国産", grip:"high", uses:["街乗り","サーキット","ジムカーナ"], tw:"TW 200", price:98000, sizes:["195/50R15","205/50R15","195/50R16","205/45R16","205/50R16","225/45R16","215/45R17","225/45R17","235/40R17","245/40R17","255/40R17","265/35R18"], rate:{grip:4,wet:4,life:3,cost:3,heat:3}, features:["街乗り兼スポーツに向く","ウェット性能も比較的良い","ライフとグリップのバランス型"]},
+  {name:"TOYO PROXES R1R", maker:"TOYO", group:"domestic", origin:"国産", grip:"high", uses:["ジムカーナ","練習用","雨用"], tw:"TW 200", price:72000, sizes:["185/60R14","195/50R15","205/50R15","195/50R16","205/45R16","205/50R16","225/45R16","215/45R17","225/45R17"], rate:{grip:4,wet:4,life:2,cost:4,heat:2}, features:["柔らかめで食いつき感が強い","雨や低温でも使いやすい","熱が入るとタレに注意"]},
 
-  {name:"NANKANG CR-S", maker:"NANKANG", group:"asian", origin:"アジアン", grip:"high", uses:["ジムカーナ","サーキット","練習用"], tw:"TW 200", price:78000, sizes:["195/50R15","205/50R15","215/45R17","225/45R17","235/40R17","245/40R17","255/40R17","265/35R18"], rate:{grip:4,wet:2,life:3,cost:4,heat:4}, features:["海外ハイグリップの人気候補","ドライ性能と価格のバランスが良い","国産上位より安く狙いやすい"]},
-  {name:"NANKANG AR-1", maker:"NANKANG", group:"asian", origin:"アジアン", grip:"high", uses:["サーキット","練習用"], tw:"TW 80", price:76000, sizes:["195/50R15","205/50R15","225/45R17","235/40R17","245/40R17","265/35R18"], rate:{grip:4,wet:1,life:2,cost:4,heat:3}, features:["セミスリック寄りでドライグリップ重視","価格に対してグリップが高い","雨や低温は注意"]},
-  {name:"NANKANG NS-2R", maker:"NANKANG", group:"asian", origin:"アジアン", grip:"cost", uses:["練習用","サーキット","街乗り"], tw:"TW 120 / 180", price:52000, sizes:["165/55R15","195/50R15","205/50R15","215/45R17","225/45R17","235/40R17","245/40R17","265/35R18"], rate:{grip:3,wet:2,life:3,cost:5,heat:3}, features:["価格が安く練習用に向く","サイズ展開が多い","国産ハイグリップほどの絶対性能はない"]},
-  {name:"FEDERAL 595RS-RR", maker:"FEDERAL", group:"asian", origin:"アジアン", grip:"cost", uses:["練習用","サーキット","ドリフト"], tw:"TW 200", price:56000, sizes:["195/50R15","205/50R15","215/45R17","225/45R17","235/40R17","245/40R17","255/40R17","265/35R18"], rate:{grip:3,wet:2,life:3,cost:5,heat:3}, features:["安価なスポーツタイヤとして定番","練習量を増やしたい人向け","ロードノイズや快適性は割り切り"]},
-  {name:"KUMHO ECSTA V730", maker:"KUMHO", group:"asian", origin:"アジアン", grip:"high", uses:["サーキット","ジムカーナ","練習用"], tw:"TW 200", price:76000, sizes:["195/50R15","205/50R15","215/45R17","225/45R17","235/40R17","245/40R17","255/40R17","265/35R18"], rate:{grip:4,wet:2,life:3,cost:4,heat:4}, features:["海外勢の中では競技寄り","ドライグリップ重視","価格と性能のバランスが良い"]},
-  {name:"HANKOOK Ventus RS4", maker:"HANKOOK", group:"asian", origin:"アジアン", grip:"balance", uses:["サーキット","街乗り","練習用"], tw:"TW 200", price:84000, sizes:["195/50R15","205/50R15","215/45R17","225/45R17","235/40R17","245/40R17","255/40R17","265/35R18"], rate:{grip:3,wet:3,life:5,cost:3,heat:5}, features:["ライフが長めで練習向き","連続周回に強い傾向","一発の絶対グリップより耐久型"]},
-  {name:"VITOUR TEMPESTA ENZO V-02R", maker:"VITOUR", group:"asian", origin:"アジアン", grip:"cost", uses:["練習用","サーキット","ドリフト"], tw:"TW 200", price:58000, sizes:["165/55R15","195/50R15","205/50R15","225/45R17","235/40R17","245/40R17","265/35R18"], rate:{grip:3,wet:2,life:3,cost:5,heat:3}, features:["コストを抑えたスポーツ走行向け","練習用として候補","サイズやロット差も確認したい"]},
-  {name:"ACCELERA 651 SPORT", maker:"ACCELERA", group:"asian", origin:"アジアン", grip:"cost", uses:["練習用","ドリフト","街乗り"], tw:"TW 200", price:46000, sizes:["195/50R15","205/50R15","215/45R17","225/45R17","235/40R17","245/40R17","265/35R18"], rate:{grip:2,wet:2,life:3,cost:5,heat:2}, features:["かなり安価で練習用に向く","ドリフトや街乗り兼用で選びやすい","本番用の絶対グリップは期待しすぎない"]},
-  {name:"VALINO PERGEA 08R", maker:"VALINO", group:"asian", origin:"アジアン", grip:"cost", uses:["ドリフト","練習用","サーキット"], tw:"TW 200", price:64000, sizes:["195/50R15","215/45R17","225/45R17","235/40R17","245/40R17","255/40R17","265/35R18"], rate:{grip:3,wet:2,life:3,cost:4,heat:3}, features:["ドリフト系で人気の候補","コストとグリップのバランス型","グリップ用途では温度域確認が必要"]},
-  {name:"ZESTINO Gredge 07RS", maker:"ZESTINO", group:"asian", origin:"アジアン", grip:"cost", uses:["ドリフト","練習用","サーキット"], tw:"TW 240", price:62000, sizes:["195/50R15","215/45R17","225/45R17","235/40R17","245/40R17","265/35R18"], rate:{grip:3,wet:2,life:3,cost:4,heat:3}, features:["ドリフト・練習用途で選びやすい","価格が比較的安い","本番グリップより練習量重視"]},
-  {name:"TRIANGLE Sportex TH201", maker:"TRIANGLE", group:"asian", origin:"アジアン", grip:"cost", uses:["街乗り","練習用"], tw:"不明", price:36000, sizes:["165/55R15","195/50R15","205/50R15","215/45R17","225/45R17","235/40R17"], rate:{grip:2,wet:2,life:3,cost:5,heat:2}, features:["かなり安価なアジアン系候補","街乗りや低負荷練習向け","競技グリップは期待しすぎない"]},
-  {name:"MOMO TOPRUN M-30", maker:"MOMO", group:"asian", origin:"アジアン", grip:"cost", uses:["街乗り","練習用"], tw:"不明", price:39000, sizes:["195/50R15","205/50R15","215/45R17","225/45R17","235/40R17","245/40R17"], rate:{grip:2,wet:3,life:3,cost:5,heat:2}, features:["安価で入手しやすい候補","街乗り兼練習用","限界域の情報は事前確認推奨"]},
-  {name:"MINERVA F205", maker:"MINERVA", group:"asian", origin:"アジアン", grip:"cost", uses:["街乗り","練習用"], tw:"不明", price:34000, sizes:["165/55R15","195/50R15","205/50R15","215/45R17","225/45R17","235/40R17","245/40R17"], rate:{grip:2,wet:2,life:3,cost:5,heat:2}, features:["低価格帯の代表候補","街乗りや転がし用に向く","スポーツ走行の本番用ではない"]},
-  {name:"ZEETEX HP2000 vfm", maker:"ZEETEX", group:"asian", origin:"アジアン", grip:"cost", uses:["街乗り","練習用"], tw:"不明", price:33000, sizes:["165/55R15","195/50R15","205/50R15","215/45R17","225/45R17","235/40R17"], rate:{grip:2,wet:2,life:3,cost:5,heat:2}, features:["低価格重視の候補","街乗り・移動用向き","グリップ限界は低めに見た方が安全"]},
-  {name:"GRENLANDER L-ZEAL 56", maker:"GRENLANDER", group:"asian", origin:"アジアン", grip:"cost", uses:["街乗り","練習用"], tw:"不明", price:32000, sizes:["165/55R15","195/50R15","205/50R15","215/45R17","225/45R17","235/40R17"], rate:{grip:2,wet:2,life:3,cost:5,heat:2}, features:["とにかく安さ重視の候補","街乗り・保管用・転がし用","競技性能は期待しすぎない"]},
-  {name:"HIFLY HF805", maker:"HIFLY", group:"asian", origin:"アジアン", grip:"cost", uses:["街乗り","練習用"], tw:"不明", price:35000, sizes:["165/55R15","195/50R15","205/50R15","215/45R17","225/45R17","235/40R17","245/40R17"], rate:{grip:2,wet:2,life:3,cost:5,heat:2}, features:["安価でサイズ展開が多い","街乗り用として選びやすい","本格スポーツ走行は不向き"]},
-  {name:"DAVANTI DX640", maker:"DAVANTI", group:"europe", origin:"欧州", grip:"balance", uses:["街乗り","雨用","練習用"], tw:"不明", price:48000, sizes:["195/50R15","205/50R15","215/45R17","225/45R17","235/40R17","245/40R17","265/35R18"], rate:{grip:3,wet:4,life:3,cost:4,heat:2}, features:["街乗り寄りのバランス型","ウェットや快適性も意識","競技用ハイグリップではない"]},
-  {name:"SAILUN ATREZZO ZSR", maker:"SAILUN", group:"asian", origin:"アジアン", grip:"cost", uses:["街乗り","練習用"], tw:"不明", price:42000, sizes:["195/50R15","205/50R15","215/45R17","225/45R17","235/40R17","245/40R17","265/35R18"], rate:{grip:2,wet:3,life:3,cost:5,heat:2}, features:["価格を抑えたスポーツ風タイヤ","街乗りと軽い練習向け","限界走行では情報収集推奨"]},
-  {name:"WINRUN R330", maker:"WINRUN", group:"asian", origin:"アジアン", grip:"cost", uses:["街乗り","練習用"], tw:"不明", price:30000, sizes:["165/55R15","195/50R15","205/50R15","215/45R17","225/45R17","235/40R17"], rate:{grip:1,wet:2,life:3,cost:5,heat:1}, features:["最安帯の候補","転がし・街乗り用","スポーツ性能は低めに見るべき"]},
-  {name:"MICHELIN PILOT SPORT 5", maker:"MICHELIN", group:"europe", origin:"欧州", grip:"balance", uses:["街乗り","雨用"], tw:"TW 300以上", price:110000, sizes:["205/50R15","215/45R17","225/45R17","235/40R17","245/40R17","255/40R17","265/35R18"], rate:{grip:3,wet:5,life:5,cost:2,heat:3}, features:["街乗り快適性とウェットに強い","ライフが長め","競技の一発グリップより総合性能型"]},
-  {name:"GOODYEAR EAGLE F1 SPORT", maker:"GOODYEAR", group:"america", origin:"北米", grip:"balance", uses:["街乗り","雨用","練習用"], tw:"TW 300以上", price:76000, sizes:["195/50R15","205/50R15","215/45R17","225/45R17","235/40R17","245/40R17"], rate:{grip:3,wet:4,life:4,cost:3,heat:2}, features:["街乗りスポーツ向け","ウェットと快適性のバランス","競技用ハイグリップではない"]}
+  {name:"NANKANG CR-S", maker:"NANKANG", group:"asian", origin:"アジアン", grip:"high", uses:["ジムカーナ","サーキット","練習用"], tw:"TW 200", price:78000, sizes:["195/50R15","205/50R15","195/50R16","205/45R16","205/50R16","225/45R16","215/45R17","225/45R17","235/40R17","245/40R17","255/40R17","265/35R18"], rate:{grip:4,wet:2,life:3,cost:4,heat:4}, features:["海外ハイグリップの人気候補","ドライ性能と価格のバランスが良い","国産上位より安く狙いやすい"]},
+  {name:"NANKANG AR-1", maker:"NANKANG", group:"asian", origin:"アジアン", grip:"high", uses:["サーキット","練習用"], tw:"TW 80", price:76000, sizes:["195/50R15","205/50R15","195/50R16","205/45R16","205/50R16","225/45R16","225/45R17","235/40R17","245/40R17","265/35R18"], rate:{grip:4,wet:1,life:2,cost:4,heat:3}, features:["セミスリック寄りでドライグリップ重視","価格に対してグリップが高い","雨や低温は注意"]},
+  {name:"NANKANG NS-2R", maker:"NANKANG", group:"asian", origin:"アジアン", grip:"cost", uses:["練習用","サーキット","街乗り"], tw:"TW 120 / 180", price:52000, sizes:["165/55R15","195/50R15","205/50R15","195/50R16","205/45R16","205/50R16","225/45R16","215/45R17","225/45R17","235/40R17","245/40R17","265/35R18"], rate:{grip:3,wet:2,life:3,cost:5,heat:3}, features:["価格が安く練習用に向く","サイズ展開が多い","国産ハイグリップほどの絶対性能はない"]},
+  {name:"FEDERAL 595RS-RR", maker:"FEDERAL", group:"asian", origin:"アジアン", grip:"cost", uses:["練習用","サーキット","ドリフト"], tw:"TW 200", price:56000, sizes:["195/50R15","205/50R15","195/50R16","205/45R16","205/50R16","225/45R16","215/45R17","225/45R17","235/40R17","245/40R17","255/40R17","265/35R18"], rate:{grip:3,wet:2,life:3,cost:5,heat:3}, features:["安価なスポーツタイヤとして定番","練習量を増やしたい人向け","ロードノイズや快適性は割り切り"]},
+  {name:"KUMHO ECSTA V730", maker:"KUMHO", group:"asian", origin:"アジアン", grip:"high", uses:["サーキット","ジムカーナ","練習用"], tw:"TW 200", price:76000, sizes:["195/50R15","205/50R15","195/50R16","205/45R16","205/50R16","225/45R16","215/45R17","225/45R17","235/40R17","245/40R17","255/40R17","265/35R18"], rate:{grip:4,wet:2,life:3,cost:4,heat:4}, features:["海外勢の中では競技寄り","ドライグリップ重視","価格と性能のバランスが良い"]},
+  {name:"HANKOOK Ventus RS4", maker:"HANKOOK", group:"asian", origin:"アジアン", grip:"balance", uses:["サーキット","街乗り","練習用"], tw:"TW 200", price:84000, sizes:["195/50R15","205/50R15","195/50R16","205/45R16","205/50R16","225/45R16","215/45R17","225/45R17","235/40R17","245/40R17","255/40R17","265/35R18"], rate:{grip:3,wet:3,life:5,cost:3,heat:5}, features:["ライフが長めで練習向き","連続周回に強い傾向","一発の絶対グリップより耐久型"]},
+  {name:"VITOUR TEMPESTA ENZO V-02R", maker:"VITOUR", group:"asian", origin:"アジアン", grip:"cost", uses:["練習用","サーキット","ドリフト"], tw:"TW 200", price:58000, sizes:["165/55R15","195/50R15","205/50R15","195/50R16","205/45R16","205/50R16","225/45R16","225/45R17","235/40R17","245/40R17","265/35R18"], rate:{grip:3,wet:2,life:3,cost:5,heat:3}, features:["コストを抑えたスポーツ走行向け","練習用として候補","サイズやロット差も確認したい"]},
+  {name:"ACCELERA 651 SPORT", maker:"ACCELERA", group:"asian", origin:"アジアン", grip:"cost", uses:["練習用","ドリフト","街乗り"], tw:"TW 200", price:46000, sizes:["195/50R15","205/50R15","195/50R16","205/45R16","205/50R16","225/45R16","215/45R17","225/45R17","235/40R17","245/40R17","265/35R18"], rate:{grip:2,wet:2,life:3,cost:5,heat:2}, features:["かなり安価で練習用に向く","ドリフトや街乗り兼用で選びやすい","本番用の絶対グリップは期待しすぎない"]},
+  {name:"VALINO PERGEA 08R", maker:"VALINO", group:"asian", origin:"アジアン", grip:"cost", uses:["ドリフト","練習用","サーキット"], tw:"TW 200", price:64000, sizes:["195/50R15","195/50R16","205/45R16","205/50R16","225/45R16","215/45R17","225/45R17","235/40R17","245/40R17","255/40R17","265/35R18"], rate:{grip:3,wet:2,life:3,cost:4,heat:3}, features:["ドリフト系で人気の候補","コストとグリップのバランス型","グリップ用途では温度域確認が必要"]},
+  {name:"ZESTINO Gredge 07RS", maker:"ZESTINO", group:"asian", origin:"アジアン", grip:"cost", uses:["ドリフト","練習用","サーキット"], tw:"TW 240", price:62000, sizes:["195/50R15","195/50R16","205/45R16","205/50R16","225/45R16","215/45R17","225/45R17","235/40R17","245/40R17","265/35R18"], rate:{grip:3,wet:2,life:3,cost:4,heat:3}, features:["ドリフト・練習用途で選びやすい","価格が比較的安い","本番グリップより練習量重視"]},
+  {name:"TRIANGLE Sportex TH201", maker:"TRIANGLE", group:"asian", origin:"アジアン", grip:"cost", uses:["街乗り","練習用"], tw:"不明", price:36000, sizes:["165/55R15","195/50R15","205/50R15","195/50R16","205/45R16","205/50R16","225/45R16","215/45R17","225/45R17","235/40R17"], rate:{grip:2,wet:2,life:3,cost:5,heat:2}, features:["かなり安価なアジアン系候補","街乗りや低負荷練習向け","競技グリップは期待しすぎない"]},
+  {name:"MOMO TOPRUN M-30", maker:"MOMO", group:"asian", origin:"アジアン", grip:"cost", uses:["街乗り","練習用"], tw:"不明", price:39000, sizes:["195/50R15","205/50R15","195/50R16","205/45R16","205/50R16","225/45R16","215/45R17","225/45R17","235/40R17","245/40R17"], rate:{grip:2,wet:3,life:3,cost:5,heat:2}, features:["安価で入手しやすい候補","街乗り兼練習用","限界域の情報は事前確認推奨"]},
+  {name:"MINERVA F205", maker:"MINERVA", group:"asian", origin:"アジアン", grip:"cost", uses:["街乗り","練習用"], tw:"不明", price:34000, sizes:["165/55R15","195/50R15","205/50R15","195/50R16","205/45R16","205/50R16","225/45R16","215/45R17","225/45R17","235/40R17","245/40R17"], rate:{grip:2,wet:2,life:3,cost:5,heat:2}, features:["低価格帯の代表候補","街乗りや転がし用に向く","スポーツ走行の本番用ではない"]},
+  {name:"ZEETEX HP2000 vfm", maker:"ZEETEX", group:"asian", origin:"アジアン", grip:"cost", uses:["街乗り","練習用"], tw:"不明", price:33000, sizes:["165/55R15","195/50R15","205/50R15","195/50R16","205/45R16","205/50R16","225/45R16","215/45R17","225/45R17","235/40R17"], rate:{grip:2,wet:2,life:3,cost:5,heat:2}, features:["低価格重視の候補","街乗り・移動用向き","グリップ限界は低めに見た方が安全"]},
+  {name:"GRENLANDER L-ZEAL 56", maker:"GRENLANDER", group:"asian", origin:"アジアン", grip:"cost", uses:["街乗り","練習用"], tw:"不明", price:32000, sizes:["165/55R15","195/50R15","205/50R15","195/50R16","205/45R16","205/50R16","225/45R16","215/45R17","225/45R17","235/40R17"], rate:{grip:2,wet:2,life:3,cost:5,heat:2}, features:["とにかく安さ重視の候補","街乗り・保管用・転がし用","競技性能は期待しすぎない"]},
+  {name:"HIFLY HF805", maker:"HIFLY", group:"asian", origin:"アジアン", grip:"cost", uses:["街乗り","練習用"], tw:"不明", price:35000, sizes:["165/55R15","195/50R15","205/50R15","195/50R16","205/45R16","205/50R16","225/45R16","215/45R17","225/45R17","235/40R17","245/40R17"], rate:{grip:2,wet:2,life:3,cost:5,heat:2}, features:["安価でサイズ展開が多い","街乗り用として選びやすい","本格スポーツ走行は不向き"]},
+  {name:"DAVANTI DX640", maker:"DAVANTI", group:"europe", origin:"欧州", grip:"balance", uses:["街乗り","雨用","練習用"], tw:"不明", price:48000, sizes:["195/50R15","205/50R15","195/50R16","205/45R16","205/50R16","225/45R16","215/45R17","225/45R17","235/40R17","245/40R17","265/35R18"], rate:{grip:3,wet:4,life:3,cost:4,heat:2}, features:["街乗り寄りのバランス型","ウェットや快適性も意識","競技用ハイグリップではない"]},
+  {name:"SAILUN ATREZZO ZSR", maker:"SAILUN", group:"asian", origin:"アジアン", grip:"cost", uses:["街乗り","練習用"], tw:"不明", price:42000, sizes:["195/50R15","205/50R15","195/50R16","205/45R16","205/50R16","225/45R16","215/45R17","225/45R17","235/40R17","245/40R17","265/35R18"], rate:{grip:2,wet:3,life:3,cost:5,heat:2}, features:["価格を抑えたスポーツ風タイヤ","街乗りと軽い練習向け","限界走行では情報収集推奨"]},
+  {name:"WINRUN R330", maker:"WINRUN", group:"asian", origin:"アジアン", grip:"cost", uses:["街乗り","練習用"], tw:"不明", price:30000, sizes:["165/55R15","195/50R15","205/50R15","195/50R16","205/45R16","205/50R16","225/45R16","215/45R17","225/45R17","235/40R17"], rate:{grip:1,wet:2,life:3,cost:5,heat:1}, features:["最安帯の候補","転がし・街乗り用","スポーツ性能は低めに見るべき"]},
+    {name:"NANKANG NS-2R", maker:"NANKANG", group:"asian", origin:"アジアン", grip:"cost", uses:["練習用","サーキット","街乗り"], tw:"TW 120 / 180", price:56000, sizes:["195/50R15","205/50R15","195/50R16","205/45R16","205/50R16","225/45R16","215/45R17","225/45R17"], rate:{grip:3,wet:2,life:3,cost:5,heat:3}, features:["205/50R16でも候補に入りやすい定番アジアン","練習用としてコスパが高い","本番用の絶対グリップは国産上位に劣る"]},
+  {name:"NANKANG CR-S", maker:"NANKANG", group:"asian", origin:"アジアン", grip:"high", uses:["ジムカーナ","サーキット","練習用"], tw:"TW 200", price:78000, sizes:["195/50R15","205/50R15","195/50R16","205/45R16","205/50R16","225/45R16","215/45R17","225/45R17"], rate:{grip:4,wet:2,life:3,cost:4,heat:4}, features:["国産上位より安く狙えるハイグリップ候補","ドライ性能重視","ジムカーナ・サーキット練習に向く"]},
+  {name:"FEDERAL 595RS-RR", maker:"FEDERAL", group:"asian", origin:"アジアン", grip:"cost", uses:["練習用","サーキット","ドリフト"], tw:"TW 200", price:56000, sizes:["195/50R15","205/50R15","195/50R16","205/45R16","205/50R16","225/45R16","215/45R17","225/45R17"], rate:{grip:3,wet:2,life:3,cost:5,heat:3}, features:["価格を抑えたスポーツ走行候補","練習量を増やしたい人向け","ロードノイズや快適性は割り切り"]},
+  {name:"MICHELIN PILOT SPORT 5", maker:"MICHELIN", group:"europe", origin:"欧州", grip:"balance", uses:["街乗り","雨用"], tw:"TW 300以上", price:110000, sizes:["205/50R15","195/50R16","205/45R16","205/50R16","225/45R16","215/45R17","225/45R17","235/40R17","245/40R17","255/40R17","265/35R18"], rate:{grip:3,wet:5,life:5,cost:2,heat:3}, features:["街乗り快適性とウェットに強い","ライフが長め","競技の一発グリップより総合性能型"]},
+  {name:"GOODYEAR EAGLE F1 SPORT", maker:"GOODYEAR", group:"america", origin:"北米", grip:"balance", uses:["街乗り","雨用","練習用"], tw:"TW 300以上", price:76000, sizes:["195/50R15","205/50R15","195/50R16","205/45R16","205/50R16","225/45R16","215/45R17","225/45R17","235/40R17","245/40R17"], rate:{grip:3,wet:4,life:4,cost:3,heat:2}, features:["街乗りスポーツ向け","ウェットと快適性のバランス","競技用ハイグリップではない"]}
 ];
 
 
@@ -549,6 +552,23 @@ function marketUrl(site,query){
   if(site==="価格.com")return "https://kakaku.com/search_results/"+q+"/";
   return "#";
 }
+
+function parseSizeStr(s){
+  const m=String(s).match(/(\d+)\/(\d+)R(\d+)/);
+  return m ? {w:Number(m[1]),a:Number(m[2]),i:Number(m[3])} : null;
+}
+function nearSizeMatch(item, targetSize){
+  if(item.sizes.includes(targetSize)) return {match:true, exact:true, label:targetSize};
+  const t=parseSizeStr(targetSize);
+  if(!t) return {match:false};
+  const near=item.sizes.find(s=>{
+    const p=parseSizeStr(s);
+    if(!p) return false;
+    return p.i===t.i && Math.abs(p.w-t.w)<=20 && Math.abs(p.a-t.a)<=5;
+  });
+  return near ? {match:true, exact:false, label:near} : {match:false};
+}
+
 function searchTires(saveHistory=true){
   const use=searchUse.value, grip=searchGrip.value, group=makerGroup.value, tw=twFilter.value, pri=priority.value;
   const size=`${searchWidth.value}/${searchAspect.value}R${searchInch.value}`, max=Number(budget.value);
@@ -558,7 +578,8 @@ function searchTires(saveHistory=true){
   const budgetLabel=budget.options[budget.selectedIndex].text;
 
   const results=tireCatalog
-    .filter(t=>t.sizes.includes(size))
+    .map(t=>({...t, matchInfo:nearSizeMatch(t,size)}))
+    .filter(t=>t.matchInfo.match)
     .filter(t=>group==="all" ? true : t.group===group)
     .filter(t=>twMatch(t.tw,tw))
     .filter(t=>t.price<=max)
@@ -589,15 +610,15 @@ function searchTires(saveHistory=true){
   }
 
   searchResults.innerHTML = results.length ? results.map((t,i)=>{
-    const query=`${t.name} ${size} 新品 タイヤ`;
+    const query=`${t.name} ${t.matchInfo.exact ? size : t.matchInfo.label} 新品 タイヤ`;
     const cheapest=Math.round(t.price*0.92);
     return `<div class="card newTire">
       <div class="title"><span class="rankBadge">${i+1}</span>${t.name}</div>
       <div class="stars">${stars(t.overall)} <span class="small">${t.overall.toFixed(1)}/5</span></div>
-      <div class="meta">${size} / ${t.tw} / 想定相場 4本</div>
+      <div class="meta">${t.matchInfo.exact ? size : "近いサイズ："+t.matchInfo.label+"（指定 "+size+"）"} / ${t.tw} / 想定相場 4本</div>
       <div class="price">約 ¥${cheapest.toLocaleString()}〜</div>
       <span class="tag gold">${t.origin} / ${t.uses.join(" / ")}</span>
-      <span class="tag good">予算内候補</span>
+      <span class="tag good">予算内候補</span><span class="tag ${t.matchInfo.exact?'good':'warn'}">${t.matchInfo.exact?"サイズ一致":"近いサイズ"}</span>
       <div class="ratingGrid">
         <div class="ratingItem"><b>グリップ</b> ${stars(t.rate.grip)}</div>
         <div class="ratingItem"><b>ウェット</b> ${stars(t.rate.wet)}</div>
@@ -622,7 +643,7 @@ function searchTires(saveHistory=true){
         </div>
       </div>
     </div>`;
-  }).join("") : `<div class="empty">条件に合う予算内候補がありません。予算・サイズ・分類・TWを広げてください。</div>`;
+  }).join("") : `<div class="empty">条件に合う予算内候補がありません。予算・メーカー分類・TW指定を広げるか、近いサイズも含めて再検索してください。</div>`;
 }
 
 fill();seed();render();renderSearchHistory();toggleCustomRegisterFields();
