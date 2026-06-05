@@ -4,13 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Grenze</title>
-  <link rel="apple-touch-icon" href="apple-touch-icon.png">
-  <link rel="icon" type="image/png" href="favicon.png">
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#08090A">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="Grenze">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <style>
     :root{
       --bg:#050505; --panel:#111; --panel2:#171717; --gold:#bfc3c7; --gold2:#f4f5f6;
@@ -302,6 +295,18 @@
       border-color:rgba(210,214,218,.24)!important;
     }
 
+
+    .miniReset{
+      margin-top:10px;
+      border:1px solid var(--line2);
+      border-radius:13px;
+      padding:9px 10px;
+      background:rgba(255,255,255,.035);
+      color:var(--muted);
+      font-size:12px;
+      width:100%;
+    }
+
   </style>
 </head>
 <body>
@@ -331,6 +336,7 @@
         <div><div class="num" id="storedNum">0</div><div class="cap">保管中</div></div>
         <div><div class="num" id="usedNum">0</div><div class="cap">履歴あり</div></div>
       </div>
+      <button class="miniReset" onclick="clearAllTireData()">保存データをすべて削除</button>
     </div>
     <div id="homeList"></div>
   </section>
@@ -498,6 +504,42 @@
 let tires=JSON.parse(localStorage.getItem("stint_tires_v1")||"[]");
 let selectedWear="均一";
 
+
+function removeOldSampleDataOnce(){
+  const flagKey = "grenze_sample_removed_v1";
+  if(localStorage.getItem(flagKey)==="done") return;
+
+  const keys = ["stint_tires_v1","luxury_tires","tires"];
+  keys.forEach(key=>{
+    try{
+      const data = JSON.parse(localStorage.getItem(key) || "[]");
+      if(Array.isArray(data)){
+        const cleaned = data.filter(t=>{
+          const name = `${t.maker||""} ${t.model||""}`.toUpperCase();
+          const isSample =
+            name.includes("DUNLOP") &&
+            (name.includes("DIREZZA") || name.includes("ZⅢ") || name.includes("ZIII")) &&
+            String(t.groove||"").includes("4.5") &&
+            String(t.wear||"").includes("外減り");
+          return !isSample;
+        });
+        localStorage.setItem(key, JSON.stringify(cleaned));
+      }
+    }catch(e){}
+  });
+
+  // 検索履歴もサンプル由来っぽいものだけ削除
+  try{
+    const histories = JSON.parse(localStorage.getItem("grenze_search_history") || "[]");
+    if(Array.isArray(histories)){
+      const cleaned = histories.filter(h=>!String(h.top||"").includes("DIREZZA"));
+      localStorage.setItem("grenze_search_history", JSON.stringify(cleaned));
+    }
+  }catch(e){}
+
+  localStorage.setItem(flagKey,"done");
+}
+
 function fill(){
   for(let i=new Date().getFullYear();i>=2015;i--) year.add(new Option(i+"年",i));
   for(let i=1;i<=53;i++) week.add(new Option(i+"週",i));
@@ -516,10 +558,18 @@ function toggleGrooveInput(){
   grooveWrap.style.display = isNew ? "none" : "block";
 }
 function seed(){
-  if(tires.length)return;
-  tires=[{id:Date.now(),maker:"DUNLOP",model:"DIREZZA ZⅢ",tw:"TW 200",compound:"ラジアル",width:"195",aspect:"50",inch:"15",year:"2024",week:"12",buyDate:"2024-03-15",groove:"4.5",condition:"練習用",newUsed:"USED",storagePlace:"ガレージA 棚2段目",storageState:"屋内・横積み・カバーあり",wear:"外減り",wearMemos:[{date:new Date().toISOString().slice(0,10),wear:"外減り",memo:"フロント使用が多く外側が減り気味。左右ローテーション推奨。"}],histories:[]}];
-  save();
+  // サンプルタイヤは自動追加しない
 }
+
+function clearAllTireData(){
+  if(!confirm("登録タイヤと検索履歴をすべて削除しますか？")) return;
+  ["stint_tires_v1","luxury_tires","tires","grenze_search_history"].forEach(k=>localStorage.removeItem(k));
+  tires=[];
+  if(typeof searchHistories !== "undefined") searchHistories=[];
+  render();
+  if(typeof renderSearchHistory === "function") renderSearchHistory();
+}
+
 function save(){localStorage.setItem("stint_tires_v1",JSON.stringify(tires));render()}
 function tireName(t){return `${t.maker} ${t.model}`}
 function addTire(){
@@ -568,7 +618,7 @@ function logs(t){
 function render(){
   totalNum.textContent=tires.length; storedNum.textContent=tires.filter(t=>t.condition!="廃棄候補").length; usedNum.textContent=tires.filter(t=>t.histories.length>0).length;
   [historyTire,wearTire].forEach(sel=>{sel.innerHTML="";tires.forEach(t=>sel.add(new Option(`${tireName(t)} ${t.width}/${t.aspect}R${t.inch}`,t.id)))});
-  homeList.innerHTML=tires.length?tires.map(t=>card(t,true)).join(""):`<div class="empty">まだタイヤが登録されていません</div>`;
+  homeList.innerHTML=tires.length?tires.map(t=>card(t,true)).join(""):`<div class="empty">登録されているタイヤはありません<br><br><button class="btnSub" onclick="showTab(\'add\',document.querySelectorAll(\'.tab\')[1])">＋ タイヤを登録する</button></div>`;
   analysisList.innerHTML=tires.length?tires.map(t=>{const r=rank(t);return `<div class="card newTire"><h2>AI分析</h2><div class="title">${tireName(t)}</div><div class="score">${r.score}<span class="small">/100</span></div><div class="ai">${r.notes.join("<br>")}<br><br><b style="color:var(--gold2)">推奨：</b>${r.score>=75?"本番用として候補。走行前に空気圧と表面状態を確認。":r.score>=45?"練習用メイン。左右ローテーションと摩耗確認推奨。":"廃棄または低負荷確認用。競技使用は非推奨。"}</div></div>`}).join(""):`<div class="empty">分析するタイヤがありません</div>`;
 }
 function deleteTire(id){if(confirm("このタイヤを削除しますか？")){tires=tires.filter(t=>t.id!==id);save()}}
@@ -800,7 +850,7 @@ window.addEventListener("load",()=>{
   },1500);
 });
 
-fill();seed();render();renderSearchHistory();toggleCustomRegisterFields();
+removeOldSampleDataOnce();fill();seed();render();renderSearchHistory();toggleCustomRegisterFields();
 </script>
 </body>
 </html>
