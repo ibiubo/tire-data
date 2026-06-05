@@ -118,6 +118,32 @@
     .featureList{margin:10px 0 0;padding-left:18px;color:var(--muted);font-size:13px;line-height:1.65}
     .rankBadge{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--gold2),var(--gold));color:#050505;font-weight:900;margin-right:8px}
 
+
+    .card.newTire{
+      border-color:rgba(241,208,138,.55);
+      background:
+        linear-gradient(135deg,rgba(216,170,85,.16),transparent 42%),
+        linear-gradient(145deg,rgba(255,255,255,.085),rgba(255,255,255,.026));
+    }
+    .card.usedTire{
+      border-color:rgba(180,190,205,.26);
+      background:
+        linear-gradient(135deg,rgba(180,190,205,.09),transparent 42%),
+        linear-gradient(145deg,rgba(255,255,255,.060),rgba(255,255,255,.020));
+    }
+    .tag.newBadge{
+      color:#050505;
+      background:linear-gradient(135deg,var(--gold2),var(--gold));
+      border-color:var(--gold);
+      font-weight:900;
+    }
+    .tag.usedBadge{
+      color:#d9e2ef;
+      background:rgba(160,170,185,.15);
+      border-color:rgba(180,190,205,.35);
+      font-weight:800;
+    }
+
   </style>
 </head>
 <body>
@@ -160,6 +186,7 @@
       <label>残溝</label>
       <select id="groove"><option value="7.0">新品 / 7.0mm</option><option value="6.0">6.0mm</option><option value="5.0">5.0mm</option><option value="4.5">4.5mm</option><option value="4.0">4.0mm</option><option value="3.0">3.0mm</option><option value="2.0">2.0mm以下</option><option value="1.6">スリップサイン付近</option></select>
       <label>状態</label><select id="condition"><option>本番用</option><option>練習用</option><option>雨用</option><option>ドリケツ</option><option>予備</option><option>廃棄候補</option></select>
+      <label>新品 / USED</label><select id="newUsed"><option>新品</option><option>USED</option></select>
       <label>保管場所 / 保管状態</label>
       <div class="grid2">
         <select id="storagePlace"><option>ガレージA 棚1段目</option><option>ガレージA 棚2段目</option><option>部室</option><option>自宅屋内</option><option>屋外保管</option><option>その他</option></select>
@@ -219,20 +246,22 @@
         <option value="wet">ウェット重視</option>
       </select>
 
-      <label>コスト上限 / サイズ</label>
-      <div class="grid2">
-        <select id="budget">
-          <option value="40000">4本 4万円以内</option>
-          <option value="60000">4本 6万円以内</option>
-          <option value="80000">4本 8万円以内</option>
-          <option value="100000">4本 10万円以内</option>
-          <option value="150000">4本 15万円以内</option>
-          <option value="999999">上限なし</option>
-        </select>
-        <select id="searchSize">
-          <option>195/50R15</option><option>205/50R15</option><option>215/45R17</option><option>225/45R17</option>
-          <option>235/40R17</option><option>245/40R17</option><option>255/40R17</option><option>265/35R18</option>
-        </select>
+      <label>コスト上限</label>
+      <select id="budget">
+        <option value="40000">4本 4万円以内</option>
+        <option value="60000">4本 6万円以内</option>
+        <option value="80000">4本 8万円以内</option>
+        <option value="100000">4本 10万円以内</option>
+        <option value="150000">4本 15万円以内</option>
+        <option value="200000">4本 20万円以内</option>
+        <option value="999999">上限なし</option>
+      </select>
+
+      <label>タイヤサイズ</label>
+      <div class="grid3">
+        <select id="searchWidth"></select>
+        <select id="searchAspect"></select>
+        <select id="searchInch"></select>
       </div>
 
       <button class="btn" onclick="searchTires()">検索する</button>
@@ -259,21 +288,24 @@ let selectedWear="均一";
 function fill(){
   for(let i=new Date().getFullYear();i>=2015;i--) year.add(new Option(i+"年",i));
   for(let i=1;i<=53;i++) week.add(new Option(i+"週",i));
-  [145,155,165,175,185,195,205,215,225,235,245,255,265,275,285,295].forEach(v=>width.add(new Option(v,v)));
-  [30,35,40,45,50,55,60,65].forEach(v=>aspect.add(new Option(v,v)));
-  [13,14,15,16,17,18,19,20].forEach(v=>inch.add(new Option("R"+v,v)));
+  const widths=[135,145,155,165,175,185,195,205,215,225,235,245,255,265,275,285,295,305,315];
+  const aspects=[25,30,35,40,45,50,55,60,65,70];
+  const inches=[12,13,14,15,16,17,18,19,20,21,22];
+  widths.forEach(v=>{width.add(new Option(v,v)); if(window.searchWidth) searchWidth.add(new Option(v,v));});
+  aspects.forEach(v=>{aspect.add(new Option(v,v)); if(window.searchAspect) searchAspect.add(new Option(v,v));});
+  inches.forEach(v=>{inch.add(new Option("R"+v,v)); if(window.searchInch) searchInch.add(new Option("R"+v,v));});
   ["cold","hot"].forEach(id=>{const s=document.getElementById(id);for(let p=1.4;p<=3.4;p+=.1)s.add(new Option(p.toFixed(1)+" kgf/cm²",p.toFixed(1)))});
   runDate.value=new Date().toISOString().slice(0,10);
 }
 function seed(){
   if(tires.length)return;
-  tires=[{id:Date.now(),maker:"DUNLOP",model:"DIREZZA ZⅢ",tw:"TW 200",compound:"ラジアル",width:"195",aspect:"50",inch:"15",year:"2024",week:"12",buyDate:"2024-03-15",groove:"4.5",condition:"練習用",storagePlace:"ガレージA 棚2段目",storageState:"屋内・横積み・カバーあり",wear:"外減り",wearMemos:[{date:new Date().toISOString().slice(0,10),wear:"外減り",memo:"フロント使用が多く外側が減り気味。左右ローテーション推奨。"}],histories:[]}];
+  tires=[{id:Date.now(),maker:"DUNLOP",model:"DIREZZA ZⅢ",tw:"TW 200",compound:"ラジアル",width:"195",aspect:"50",inch:"15",year:"2024",week:"12",buyDate:"2024-03-15",groove:"4.5",condition:"練習用",newUsed:"USED",storagePlace:"ガレージA 棚2段目",storageState:"屋内・横積み・カバーあり",wear:"外減り",wearMemos:[{date:new Date().toISOString().slice(0,10),wear:"外減り",memo:"フロント使用が多く外側が減り気味。左右ローテーション推奨。"}],histories:[]}];
   save();
 }
 function save(){localStorage.setItem("stint_tires_v1",JSON.stringify(tires));render()}
 function tireName(t){return `${t.maker} ${t.model}`}
 function addTire(){
-  tires.push({id:Date.now(),maker:maker.value,model:model.value,tw:tw.value,compound:compound.value,width:width.value,aspect:aspect.value,inch:inch.value,year:year.value,week:week.value,buyDate:buyDate.value,groove:groove.value,condition:condition.value,storagePlace:storagePlace.value,storageState:storageState.value,wear:"均一",wearMemos:[],histories:[]});
+  tires.push({id:Date.now(),maker:maker.value,model:model.value,tw:tw.value,compound:compound.value,width:width.value,aspect:aspect.value,inch:inch.value,year:year.value,week:week.value,buyDate:buyDate.value,groove:groove.value,condition:condition.value,newUsed:newUsed.value,storagePlace:storagePlace.value,storageState:storageState.value,wear:"均一",wearMemos:[],histories:[]});
   save();showTab("home",document.querySelectorAll(".tab")[0]);
 }
 function addHistory(){
@@ -303,8 +335,8 @@ function rank(t){
 }
 function card(t,detail=false){
   const r=rank(t);
-  return `<div class="card">
-    <div class="tireCard"><div class="tireArt"></div><div><div class="title">${tireName(t)}</div><div class="meta">${t.width}/${t.aspect}R${t.inch}<br>${t.tw||"TW 不明"} / ${t.compound||"不明"}<br>製造 ${t.year}年${t.week}週 / 購入 ${t.buyDate||"未入力"}</div><span class="tag gold">${t.condition}</span><span class="tag ${r.cls}">${r.score>=75?"良好":r.score>=45?"注意":"危険"}</span></div><div class="right"><div class="small">残溝</div><div class="mm">${t.groove}</div><div class="small">mm</div></div></div>
+  return `<div class="card ${t.newUsed==="新品"?"newTire":"usedTire"}">
+    <div class="tireCard"><div class="tireArt"></div><div><div class="title">${tireName(t)}</div><div class="meta">${t.width}/${t.aspect}R${t.inch}<br>${t.tw||"TW 不明"} / ${t.compound||"不明"} / ${t.newUsed||"USED"}<br>製造 ${t.year}年${t.week}週 / 購入 ${t.buyDate||"未入力"}</div><span class="tag ${t.newUsed==="新品"?"newBadge":"usedBadge"}">${t.newUsed || "USED"}</span><span class="tag gold">${t.condition}</span><span class="tag ${r.cls}">${r.score>=75?"良好":r.score>=45?"注意":"危険"}</span></div><div class="right"><div class="small">残溝</div><div class="mm">${t.groove}</div><div class="small">mm</div></div></div>
     <div class="meta" style="margin-top:12px">保管：${t.storagePlace}<br>${t.storageState}<br>摩耗：${t.wear||"未記録"}</div>
     <div class="ai">${r.notes.join("<br>")}</div>
     ${detail?logs(t):""}
@@ -319,20 +351,34 @@ function render(){
   totalNum.textContent=tires.length; storedNum.textContent=tires.filter(t=>t.condition!="廃棄候補").length; usedNum.textContent=tires.filter(t=>t.histories.length>0).length;
   [historyTire,wearTire].forEach(sel=>{sel.innerHTML="";tires.forEach(t=>sel.add(new Option(`${tireName(t)} ${t.width}/${t.aspect}R${t.inch}`,t.id)))});
   homeList.innerHTML=tires.length?tires.map(t=>card(t,true)).join(""):`<div class="empty">まだタイヤが登録されていません</div>`;
-  analysisList.innerHTML=tires.length?tires.map(t=>{const r=rank(t);return `<div class="card"><h2>AI分析</h2><div class="title">${tireName(t)}</div><div class="score">${r.score}<span class="small">/100</span></div><div class="ai">${r.notes.join("<br>")}<br><br><b style="color:var(--gold2)">推奨：</b>${r.score>=75?"本番用として候補。走行前に空気圧と表面状態を確認。":r.score>=45?"練習用メイン。左右ローテーションと摩耗確認推奨。":"廃棄または低負荷確認用。競技使用は非推奨。"}</div></div>`}).join(""):`<div class="empty">分析するタイヤがありません</div>`;
+  analysisList.innerHTML=tires.length?tires.map(t=>{const r=rank(t);return `<div class="card ${t.newUsed==="新品"?"newTire":"usedTire"}"><h2>AI分析</h2><div class="title">${tireName(t)}</div><div class="score">${r.score}<span class="small">/100</span></div><div class="ai">${r.notes.join("<br>")}<br><br><b style="color:var(--gold2)">推奨：</b>${r.score>=75?"本番用として候補。走行前に空気圧と表面状態を確認。":r.score>=45?"練習用メイン。左右ローテーションと摩耗確認推奨。":"廃棄または低負荷確認用。競技使用は非推奨。"}</div></div>`}).join(""):`<div class="empty">分析するタイヤがありません</div>`;
 }
 function deleteTire(id){if(confirm("このタイヤを削除しますか？")){tires=tires.filter(t=>t.id!==id);save()}}
 function showTab(id,btn){document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));document.getElementById(id).classList.add("active");document.querySelectorAll(".tab").forEach(t=>t.classList.remove("on"));if(btn)btn.classList.add("on");render()}
 
 const tireCatalog=[
-  {name:"YOKOHAMA ADVAN A052", grip:"max", uses:["ジムカーナ","サーキット"], tw:"TW 200", price:128000, sizes:["195/50R15","225/45R17","265/35R18"], features:["強烈な初期グリップ","ジムカーナや短時間アタック向き","価格は高めで摩耗も早め"]},
-  {name:"BRIDGESTONE POTENZA RE-71RS", grip:"max", uses:["ジムカーナ","サーキット"], tw:"TW 200", price:118000, sizes:["195/50R15","225/45R17","265/35R18"], features:["縦横グリップが高い","温まりが早い","本番用として使いやすい"]},
-  {name:"DUNLOP DIREZZA ZⅢ", grip:"high", uses:["ジムカーナ","サーキット","練習用"], tw:"TW 200", price:82000, sizes:["195/50R15","205/50R15","225/45R17","265/35R18"], features:["扱いやすく練習から本番まで対応","価格と性能のバランスが良い","A052ほどの一発はないが安定"]},
-  {name:"YOKOHAMA ADVAN NEOVA AD09", grip:"high", uses:["街乗り","サーキット","ジムカーナ"], tw:"TW 200", price:98000, sizes:["195/50R15","225/45R17","235/40R17","265/35R18"], features:["街乗り兼スポーツに向く","ウェット性能も比較的良い","ライフとグリップのバランス型"]},
-  {name:"TOYO PROXES R1R", grip:"high", uses:["ジムカーナ","練習用","雨用"], tw:"TW 200", price:72000, sizes:["195/50R15","205/50R15","225/45R17"], features:["柔らかめで食いつき感が強い","雨や低温でも使いやすい","熱が入るとタレに注意"]},
-  {name:"NANKANG NS-2R", grip:"cost", uses:["練習用","サーキット","街乗り"], tw:"TW 120 / 180", price:52000, sizes:["195/50R15","225/45R17","235/40R17","265/35R18"], features:["価格が安く練習用に向く","サイズ展開が多い","国産ハイグリップほどの絶対性能はない"]},
-  {name:"SHIBATIRE R23", grip:"cost", uses:["練習用","ドリフト","サーキット"], tw:"TW 200 / 280", price:60000, sizes:["195/50R15","225/45R17","235/40R17","265/35R18"], features:["コストを抑えやすい","ドリフトや練習用途で選びやすい","コンパウンド選択が重要"]},
-  {name:"MICHELIN PILOT SPORT 5", grip:"balance", uses:["街乗り","雨用"], tw:"TW 300以上", price:110000, sizes:["215/45R17","225/45R17","235/40R17","265/35R18"], features:["街乗り快適性とウェットに強い","ライフが長め","競技の一発グリップより総合性能型"]}
+  {name:"YOKOHAMA ADVAN A052", maker:"YOKOHAMA", grip:"max", uses:["ジムカーナ","サーキット"], tw:"TW 200", price:128000, sizeRange:{w:[195,205,215,225,235,245,255,265,275,285,295],a:[30,35,40,45,50],i:[15,16,17,18,19]}, features:["強烈な初期グリップ","ジムカーナや短時間アタック向き","価格は高めで摩耗も早め"]},
+  {name:"BRIDGESTONE POTENZA RE-71RS", maker:"BRIDGESTONE", grip:"max", uses:["ジムカーナ","サーキット"], tw:"TW 200", price:118000, sizeRange:{w:[165,195,205,215,225,235,245,255,265,275,285],a:[35,40,45,50,55],i:[15,16,17,18,19]}, features:["縦横グリップが高い","温まりが早い","本番用として使いやすい"]},
+  {name:"DUNLOP DIREZZA ZⅢ", maker:"DUNLOP", grip:"high", uses:["ジムカーナ","サーキット","練習用"], tw:"TW 200", price:82000, sizeRange:{w:[165,175,185,195,205,215,225,235,245,255,265,275],a:[35,40,45,50,55,60],i:[14,15,16,17,18,19]}, features:["扱いやすく練習から本番まで対応","価格と性能のバランスが良い","一発より安定感寄り"]},
+  {name:"YOKOHAMA ADVAN NEOVA AD09", maker:"YOKOHAMA", grip:"high", uses:["街乗り","サーキット","ジムカーナ"], tw:"TW 200", price:98000, sizeRange:{w:[165,195,205,215,225,235,245,255,265,275,285],a:[30,35,40,45,50,55],i:[15,16,17,18,19,20]}, features:["街乗り兼スポーツ向き","ウェット性能も比較的良い","ライフとグリップのバランス型"]},
+  {name:"TOYO PROXES R1R", maker:"TOYO", grip:"high", uses:["ジムカーナ","練習用","雨用"], tw:"TW 200", price:72000, sizeRange:{w:[185,195,205,215,225,235,245],a:[40,45,50,55],i:[14,15,16,17,18]}, features:["柔らかめで食いつき感が強い","雨や低温でも使いやすい","熱が入るとタレに注意"]},
+
+  {name:"NANKANG CR-S", maker:"NANKANG", grip:"high", uses:["サーキット","ジムカーナ","練習用"], tw:"TW 200", price:76000, sizeRange:{w:[195,205,215,225,235,245,255,265,275,285,295],a:[30,35,40,45,50],i:[15,16,17,18,19,20]}, features:["海外勢の中ではグリップ重視","国産ハイグリップより安く狙いやすい","サイズ展開が広い"]},
+  {name:"NANKANG AR-1", maker:"NANKANG", grip:"max", uses:["サーキット"], tw:"TW 80", price:88000, sizeRange:{w:[195,205,215,225,235,245,255,265,275,295],a:[30,35,40,45,50],i:[15,16,17,18,19,20]}, features:["セミスリック寄りでドライ性能重視","熱が入った時のグリップが強い","雨や街乗りは注意"]},
+  {name:"NANKANG NS-2R", maker:"NANKANG", grip:"cost", uses:["練習用","サーキット","街乗り"], tw:"TW 120 / 180", price:52000, sizeRange:{w:[165,175,185,195,205,215,225,235,245,255,265,275],a:[35,40,45,50,55,60],i:[14,15,16,17,18,19]}, features:["価格が安く練習用に向く","サイズ展開が多い","国産ハイグリップほどの絶対性能はない"]},
+
+  {name:"FEDERAL 595RS-RR", maker:"FEDERAL", grip:"cost", uses:["練習用","サーキット"], tw:"TW 200", price:58000, sizeRange:{w:[195,205,215,225,235,245,255,265,275],a:[35,40,45,50,55],i:[15,16,17,18,19]}, features:["価格を抑えたスポーツタイヤ","練習用として使いやすい","ロードノイズや快適性は割り切り"]},
+  {name:"HANKOOK Ventus RS4", maker:"HANKOOK", grip:"balance", uses:["サーキット","街乗り","練習用"], tw:"TW 200", price:85000, sizeRange:{w:[195,205,215,225,235,245,255,265,275,285],a:[35,40,45,50,55],i:[15,16,17,18,19]}, features:["ライフが長く練習向き","熱ダレに比較的強い","一発より周回向き"]},
+  {name:"KUMHO ECSTA V730", maker:"KUMHO", grip:"high", uses:["サーキット","ジムカーナ"], tw:"TW 200", price:78000, sizeRange:{w:[195,205,215,225,235,245,255,265,275,285],a:[35,40,45,50],i:[15,16,17,18,19]}, features:["海外200TW系の高グリップ候補","価格と性能のバランスが良い","温まりと摩耗の確認が必要"]},
+  {name:"ZESTINO Gredge 07RS", maker:"ZESTINO", grip:"cost", uses:["ドリフト","練習用","サーキット"], tw:"TW 200", price:56000, sizeRange:{w:[185,195,205,215,225,235,245,255,265,275],a:[35,40,45,50,55],i:[15,16,17,18]}, features:["ドリフトや練習向けに選びやすい","コストを抑えやすい","本番グリップ用途では比較検討"]},
+  {name:"VALINO PERGEA 08R", maker:"VALINO", grip:"cost", uses:["ドリフト","練習用","サーキット"], tw:"TW 200", price:64000, sizeRange:{w:[195,205,215,225,235,245,255,265,275],a:[35,40,45,50,55],i:[15,16,17,18,19]}, features:["ドリフト系で人気の選択肢","熱の入り方を見ながら使うタイプ","サイズと在庫次第で安く狙える"]},
+  {name:"ACCELERA 651 SPORT", maker:"ACCELERA", grip:"cost", uses:["練習用","サーキット","ドリフト"], tw:"TW 200", price:48000, sizeRange:{w:[195,205,215,225,235,245,255,265,275],a:[35,40,45,50,55],i:[15,16,17,18,19]}, features:["かなり安価なスポーツ系候補","練習や予備として使いやすい","絶対グリップよりコスト重視"]},
+
+  {name:"MICHELIN PILOT SPORT 5", maker:"MICHELIN", grip:"balance", uses:["街乗り","雨用"], tw:"TW 300以上", price:110000, sizeRange:{w:[195,205,215,225,235,245,255,265,275,285],a:[30,35,40,45,50,55],i:[16,17,18,19,20]}, features:["街乗り快適性とウェットに強い","ライフが長め","競技の一発グリップより総合性能型"]},
+  {name:"CONTINENTAL ExtremeContact Sport", maker:"CONTINENTAL", grip:"balance", uses:["街乗り","雨用","サーキット"], tw:"TW 300以上", price:105000, sizeRange:{w:[205,215,225,235,245,255,265,275,285,295],a:[30,35,40,45,50],i:[17,18,19,20]}, features:["ウェットと街乗り性能が高い","高速域の安定性が良い","競技専用より万能型"]},
+  {name:"PIRELLI P ZERO", maker:"PIRELLI", grip:"balance", uses:["街乗り","サーキット"], tw:"TW 300以上", price:120000, sizeRange:{w:[205,215,225,235,245,255,265,275,285,295],a:[30,35,40,45,50],i:[17,18,19,20]}, features:["高級スポーツ系の定番","高速安定性と質感重視","コストは高め"]},
+  {name:"GOODYEAR EAGLE F1 SPORT", maker:"GOODYEAR", grip:"balance", uses:["街乗り","雨用"], tw:"TW 300以上", price:76000, sizeRange:{w:[195,205,215,225,235,245,255],a:[35,40,45,50,55],i:[16,17,18,19]}, features:["街乗りと雨で使いやすい","価格も比較的抑えめ","競技の一発より日常寄り"]},
+  {name:"FALKEN AZENIS RT660", maker:"FALKEN", grip:"high", uses:["サーキット","ジムカーナ"], tw:"TW 200", price:90000, sizeRange:{w:[195,205,215,225,235,245,255,265,275,285],a:[35,40,45,50],i:[15,16,17,18,19]}, features:["海外でも人気の200TW系","ドライグリップ重視","熱管理と摩耗確認が重要"]}
 ];
 
 function gripScore(target,item){
@@ -353,9 +399,9 @@ function marketUrl(site,query){
   return "#";
 }
 function searchTires(){
-  const use=searchUse.value, grip=searchGrip.value, size=searchSize.value, max=Number(budget.value);
+  const use=searchUse.value, grip=searchGrip.value, size=`${searchWidth.value}/${searchAspect.value}R${searchInch.value}`, max=Number(budget.value);
   const results=tireCatalog
-    .filter(t=>t.sizes.includes(size))
+    .filter(t=>t.sizeRange.w.includes(Number(searchWidth.value)) && t.sizeRange.a.includes(Number(searchAspect.value)) && t.sizeRange.i.includes(Number(searchInch.value)))
     .map(t=>{
       let score=0;
       if(t.uses.includes(use))score+=35;
@@ -370,7 +416,7 @@ function searchTires(){
   searchResults.innerHTML = results.length ? results.map((t,i)=>{
     const query=`${t.name} ${size} 新品 タイヤ`;
     const cheapest=Math.round(t.price*0.92);
-    return `<div class="card">
+    return `<div class="card ${t.newUsed==="新品"?"newTire":"usedTire"}">
       <div class="title"><span class="rankBadge">${i+1}</span>${t.name}</div>
       <div class="meta">${size} / ${t.tw} / 想定相場 4本</div>
       <div class="price">約 ¥${cheapest.toLocaleString()}〜</div>
