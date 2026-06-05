@@ -373,7 +373,7 @@ function rank(t){
 }
 function card(t,detail=false){
   const r=rank(t);
-  return `<div class="card ${t.newUsed==="新品"?"newTire":"usedTire"}">
+  return `<div class="card newTire">
     <div class="tireCard"><div class="tireArt"></div><div><div class="title">${tireName(t)}</div><div class="meta">${t.width}/${t.aspect}R${t.inch}<br>${t.tw||"TW 不明"} / ${t.compound||"不明"} / ${t.newUsed||"USED"}<br>製造 ${t.year}年${t.week}週 / 購入 ${t.buyDate||"未入力"}</div><span class="tag ${t.newUsed==="新品"?"newBadge":"usedBadge"}">${t.newUsed || "USED"}</span><span class="tag gold">${t.condition}</span><span class="tag ${r.cls}">${r.score>=75?"良好":r.score>=45?"注意":"危険"}</span></div><div class="right"><div class="small">残溝</div><div class="mm">${t.groove==="新品"?"NEW":t.groove}</div><div class="small">${t.groove==="新品"?"":"mm"}</div></div></div>
     <div class="meta" style="margin-top:12px">保管：${t.storagePlace}<br>${t.storageState}<br>摩耗：${t.wear||"未記録"}</div>
     <div class="ai">${r.notes.join("<br>")}</div>
@@ -389,7 +389,7 @@ function render(){
   totalNum.textContent=tires.length; storedNum.textContent=tires.filter(t=>t.condition!="廃棄候補").length; usedNum.textContent=tires.filter(t=>t.histories.length>0).length;
   [historyTire,wearTire].forEach(sel=>{sel.innerHTML="";tires.forEach(t=>sel.add(new Option(`${tireName(t)} ${t.width}/${t.aspect}R${t.inch}`,t.id)))});
   homeList.innerHTML=tires.length?tires.map(t=>card(t,true)).join(""):`<div class="empty">まだタイヤが登録されていません</div>`;
-  analysisList.innerHTML=tires.length?tires.map(t=>{const r=rank(t);return `<div class="card ${t.newUsed==="新品"?"newTire":"usedTire"}"><h2>AI分析</h2><div class="title">${tireName(t)}</div><div class="score">${r.score}<span class="small">/100</span></div><div class="ai">${r.notes.join("<br>")}<br><br><b style="color:var(--gold2)">推奨：</b>${r.score>=75?"本番用として候補。走行前に空気圧と表面状態を確認。":r.score>=45?"練習用メイン。左右ローテーションと摩耗確認推奨。":"廃棄または低負荷確認用。競技使用は非推奨。"}</div></div>`}).join(""):`<div class="empty">分析するタイヤがありません</div>`;
+  analysisList.innerHTML=tires.length?tires.map(t=>{const r=rank(t);return `<div class="card newTire"><h2>AI分析</h2><div class="title">${tireName(t)}</div><div class="score">${r.score}<span class="small">/100</span></div><div class="ai">${r.notes.join("<br>")}<br><br><b style="color:var(--gold2)">推奨：</b>${r.score>=75?"本番用として候補。走行前に空気圧と表面状態を確認。":r.score>=45?"練習用メイン。左右ローテーションと摩耗確認推奨。":"廃棄または低負荷確認用。競技使用は非推奨。"}</div></div>`}).join(""):`<div class="empty">分析するタイヤがありません</div>`;
 }
 function deleteTire(id){if(confirm("このタイヤを削除しますか？")){tires=tires.filter(t=>t.id!==id);save()}}
 function showTab(id,btn){document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));document.getElementById(id).classList.add("active");document.querySelectorAll(".tab").forEach(t=>t.classList.remove("on"));if(btn)btn.classList.add("on");render()}
@@ -444,7 +444,7 @@ function marketUrl(site,query){
 function searchTires(){
   const use=searchUse.value, grip=searchGrip.value, size=`${searchWidth.value}/${searchAspect.value}R${searchInch.value}`, max=Number(budget.value);
   const results=tireCatalog
-    .filter(t=>t.sizeRange.w.includes(Number(searchWidth.value)) && t.sizeRange.a.includes(Number(searchAspect.value)) && t.sizeRange.i.includes(Number(searchInch.value)))
+    .filter(t=>t.sizes.includes(size))
     .map(t=>{
       let score=0;
       if(t.uses.includes(use))score+=35;
@@ -459,11 +459,11 @@ function searchTires(){
   searchResults.innerHTML = results.length ? results.map((t,i)=>{
     const query=`${t.name} ${size} 新品 タイヤ`;
     const cheapest=Math.round(t.price*0.92);
-    return `<div class="card ${t.newUsed==="新品"?"newTire":"usedTire"}">
+    return `<div class="card newTire">
       <div class="title"><span class="rankBadge">${i+1}</span>${t.name}</div>
       <div class="meta">${size} / ${t.tw} / 想定相場 4本</div>
       <div class="price">約 ¥${cheapest.toLocaleString()}〜</div>
-      <span class="tag gold">${t.uses.join(" / ")}</span>
+      <span class="tag gold">${t.origin} / ${t.uses.join(" / ")}</span>
       <span class="tag good">予算内候補</span>
       <ul class="featureList">${t.features.map(f=>`<li>${f}</li>`).join("")}</ul>
       <div class="ai"><b style="color:var(--gold2)">選定コメント：</b>${use}用途で${grip==="max"?"最大グリップ":grip==="cost"?"コスパ":grip==="wet"?"ウェット性能":"バランス"}を重視する場合の候補。実売価格は下のリンクから確認。</div>
