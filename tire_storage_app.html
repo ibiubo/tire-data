@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>タイヤ保管管理アプリ</title>
+  <style>
+    :root {
+      --bg: #0f1115;
+      --panel: #171a21;
+      --panel2: #ffffff;
+      --text: #f5f5f5;
+      --black: #111;
+      --muted: #9ca3af;
+      --line: #2b2f3a;
+      --accent: #ffb000;
+      --danger: #ef4444;
+      --ok: #22c55e;
+      --blue: #38bdf8;
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding-bottom: 90px;
+    }
+
+    header {
+      padding: 22px 18px 12px;
+      background: linear-gradient(180deg, #1d2230, #0f1115);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 24px;
+      letter-spacing: .02em;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 6px;
+    }
+
+    main {
+      padding: 14px;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin: 8px 0 16px;
+    }
+
+    .tab {
+      border: 1px solid var(--line);
+      background: #151821;
+      color: var(--text);
+      border-radius: 999px;
+      padding: 10px 6px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .tab.active {
+      background: var(--accent);
+      color: #111;
+      border-color: var(--accent);
+      font-weight: 700;
+    }
+
+    section { display: none; }
+    section.active { display: block; }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.2);
+    }
+
+    .white-card {
+      background: var(--panel2);
+      color: var(--black);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      color: var(--muted);
+      margin: 14px 0 6px;
+    }
+
+    .white-card label { color: #444; }
+
+    select, input, textarea {
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid #d6d6d6;
+      background: #fff;
+      color: #111;
+      font-size: 15px;
+    }
+
+    textarea {
+      min-height: 88px;
+      resize: vertical;
+    }
+
+    .grid3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+    }
+
+    .grid2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    button.primary {
+      width: 100%;
+      border: none;
+      border-radius: 14px;
+      background: var(--accent);
+      color: #111;
+      font-weight: 800;
+      padding: 14px;
+      font-size: 16px;
+      margin-top: 16px;
+      cursor: pointer;
+    }
+
+    button.secondary {
+      border: 1px solid var(--line);
+      background: transparent;
+      color: var(--text);
+      border-radius: 12px;
+      padding: 10px 12px;
+      cursor: pointer;
+    }
+
+    .tire-title {
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .tag {
+      display: inline-block;
+      background: #272b36;
+      color: #fff;
+      border: 1px solid var(--line);
+      padding: 5px 9px;
+      border-radius: 999px;
+      font-size: 12px;
+      margin: 4px 4px 0 0;
+    }
+
+    .tag.good { background: rgba(34,197,94,.18); border-color: rgba(34,197,94,.4); }
+    .tag.warn { background: rgba(255,176,0,.18); border-color: rgba(255,176,0,.4); }
+    .tag.bad { background: rgba(239,68,68,.18); border-color: rgba(239,68,68,.4); }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .history {
+      border-left: 3px solid var(--accent);
+      padding-left: 10px;
+      margin-top: 10px;
+      color: #ddd;
+      font-size: 14px;
+    }
+
+    .ai-box {
+      background: #10131a;
+      border: 1px solid #343a49;
+      border-radius: 14px;
+      padding: 13px;
+      margin-top: 12px;
+      line-height: 1.65;
+      font-size: 14px;
+    }
+
+    .empty {
+      color: var(--muted);
+      text-align: center;
+      padding: 30px 10px;
+    }
+
+    .small {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>タイヤ保管管理</h1>
+    <div class="subtitle">メーカー・サイズ・残溝・保管方法・走行履歴を一括管理</div>
+  </header>
+
+  <main>
+    <div class="tabs">
+      <button class="tab active" onclick="showTab('list')">一覧</button>
+      <button class="tab" onclick="showTab('add')">登録</button>
+      <button class="tab" onclick="showTab('run')">走行履歴</button>
+      <button class="tab" onclick="showTab('analysis')">分析</button>
+    </div>
+
+    <section id="list" class="active">
+      <div id="tireList"></div>
+    </section>
+
+    <section id="add">
+      <div class="white-card">
+        <h2>タイヤ登録</h2>
+
+        <label>メーカー</label>
+        <select id="maker">
+          <option>DUNLOP</option><option>YOKOHAMA</option><option>BRIDGESTONE</option><option>ADVAN</option>
+          <option>TOYO</option><option>NANKANG</option><option>SHIBATIRE</option><option>MICHELIN</option><option>その他</option>
+        </select>
+
+        <label>銘柄</label>
+        <select id="model">
+          <option>DIREZZA ZⅢ</option><option>ADVAN A052</option><option>ADVAN NEOVA AD09</option>
+          <option>POTENZA RE-71RS</option><option>PROXES R1R</option><option>NS-2R</option>
+          <option>R23</option><option>その他</option>
+        </select>
+
+        <label>製造年月日（年・週）</label>
+        <div class="grid2">
+          <select id="year"></select>
+          <select id="week"></select>
+        </div>
+
+        <label>タイヤサイズ</label>
+        <div class="grid3">
+          <select id="width"></select>
+          <select id="aspect"></select>
+          <select id="inch"></select>
+        </div>
+
+        <label>残溝</label>
+        <select id="groove">
+          <option>新品</option><option>7mm以上</option><option>6mm</option><option>5mm</option><option>4mm</option>
+          <option>3mm</option><option>2mm以下</option><option>スリップサイン付近</option>
+        </select>
+
+        <label>保管方法</label>
+        <select id="storage">
+          <option>屋内・横積み・カバーあり</option>
+          <option>屋内・縦置き・カバーあり</option>
+          <option>屋内・横積み</option>
+          <option>屋外・カバーあり</option>
+          <option>屋外・カバーなし</option>
+          <option>ホイール付き保管</option>
+          <option>ホイールなし保管</option>
+        </select>
+
+        <label>状態</label>
+        <select id="condition">
+          <option>本番用</option><option>練習用</option><option>雨用</option><option>ドリケツ</option><option>予備</option><option>廃棄候補</option>
+        </select>
+
+        <label>摩耗状態</label>
+        <select id="wear">
+          <option>均一</option><option>外減り</option><option>内減り</option><option>片減り</option>
+          <option>センター減り</option><option>ショルダー摩耗</option><option>ブロック飛び</option><option>ヒビあり</option>
+        </select>
+
+        <button class="primary" onclick="addTire()">登録する</button>
+      </div>
+    </section>
+
+    <section id="run">
+      <div class="white-card">
+        <h2>走行履歴メモ</h2>
+
+        <label>対象タイヤ</label>
+        <select id="historyTire"></select>
+
+        <label>日付</label>
+        <input id="runDate" type="date" />
+
+        <label>車両</label>
+        <select id="car">
+          <option>ZC32S</option><option>S15</option><option>DC2</option><option>その他</option>
+        </select>
+
+        <label>場所</label>
+        <select id="place">
+          <option>FSWジムカーナ場</option><option>浅間台</option><option>筑波</option><option>日光</option><option>本庄</option><option>その他</option>
+        </select>
+
+        <label>路面</label>
+        <select id="road">
+          <option>ドライ</option><option>ウェット</option><option>ハーフウェット</option>
+        </select>
+
+        <label>使用位置</label>
+        <select id="position">
+          <option>フロント左右</option><option>リア左右</option><option>フロント左</option><option>フロント右</option><option>リア左</option><option>リア右</option>
+        </select>
+
+        <label>空気圧</label>
+        <div class="grid2">
+          <select id="cold"></select>
+          <select id="hot"></select>
+        </div>
+
+        <label>走行本数</label>
+        <select id="runs">
+          <option>1本</option><option>2本</option><option>3本</option><option>4本</option><option>5本以上</option>
+        </select>
+
+        <label>メモ</label>
+        <textarea id="memo" placeholder="例：外減り強め、熱ダレ早い、リアが流れやすい"></textarea>
+
+        <button class="primary" onclick="addHistory()">履歴を保存</button>
+      </div>
+    </section>
+
+    <section id="analysis">
+      <div id="analysisList"></div>
+    </section>
+  </main>
+
+  <script>
+    let tires = JSON.parse(localStorage.getItem("tires") || "[]");
+
+    function fillSelects() {
+      const year = document.getElementById("year");
+      for (let y = new Date().getFullYear(); y >= 2015; y--) year.add(new Option(y + "年", y));
+
+      const week = document.getElementById("week");
+      for (let w = 1; w <= 53; w++) week.add(new Option(w + "週", w));
+
+      const width = document.getElementById("width");
+      [145,155,165,175,185,195,205,215,225,235,245,255,265,275,285,295].forEach(v => width.add(new Option(v, v)));
+
+      const aspect = document.getElementById("aspect");
+      [30,35,40,45,50,55,60,65].forEach(v => aspect.add(new Option(v, v)));
+
+      const inch = document.getElementById("inch");
+      [13,14,15,16,17,18,19,20].forEach(v => inch.add(new Option("R" + v, v)));
+
+      ["cold","hot"].forEach(id => {
+        const s = document.getElementById(id);
+        for (let p = 1.4; p <= 3.2; p += 0.1) s.add(new Option(p.toFixed(1) + " kgf/cm²", p.toFixed(1)));
+      });
+    }
+
+    function save() {
+      localStorage.setItem("tires", JSON.stringify(tires));
+      render();
+    }
+
+    function addTire() {
+      const tire = {
+        id: Date.now(),
+        maker: maker.value,
+        model: model.value,
+        year: year.value,
+        week: week.value,
+        width: width.value,
+        aspect: aspect.value,
+        inch: inch.value,
+        groove: groove.value,
+        storage: storage.value,
+        condition: condition.value,
+        wear: wear.value,
+        histories: []
+      };
+      tires.push(tire);
+      save();
+      showTab("list");
+    }
+
+    function addHistory() {
+      const id = Number(historyTire.value);
+      const tire = tires.find(t => t.id === id);
+      if (!tire) return alert("タイヤを登録してください");
+
+      tire.histories.push({
+        date: runDate.value || new Date().toISOString().slice(0,10),
+        car: car.value,
+        place: place.value,
+        road: road.value,
+        position: position.value,
+        cold: cold.value,
+        hot: hot.value,
+        runs: runs.value,
+        memo: memo.value
+      });
+      memo.value = "";
+      save();
+      showTab("list");
+    }
+
+    function tireName(t) {
+      return `${t.maker} ${t.model} ${t.width}/${t.aspect}R${t.inch}`;
+    }
+
+    function analyze(t) {
+      let points = [];
+      let bad = false;
+      let warn = false;
+
+      if (["2mm以下","スリップサイン付近"].includes(t.groove)) {
+        points.push("残溝が少ないため、廃棄候補または低速練習用。");
+        bad = true;
+      } else if (["3mm","4mm"].includes(t.groove)) {
+        points.push("本番用より練習用向き。グリップ低下に注意。");
+        warn = true;
+      } else {
+        points.push("残溝的にはまだ使用可能。");
+      }
+
+      if (t.wear !== "均一") {
+        points.push(`${t.wear}傾向あり。次回はローテーション推奨。`);
+        warn = true;
+      }
+
+      if (t.storage.includes("屋外・カバーなし")) {
+        points.push("屋外カバーなし保管のため、紫外線劣化やヒビに注意。");
+        warn = true;
+      }
+
+      if (t.histories.length >= 5) {
+        points.push("走行回数が多いため、熱ダレや硬化を確認した方がよい。");
+        warn = true;
+      }
+
+      if (t.histories.some(h => h.memo.includes("熱ダレ"))) {
+        points.push("メモ上で熱ダレ傾向あり。連続走行では空気圧上昇に注意。");
+        warn = true;
+      }
+
+      if (!bad && !warn) points.push("状態は比較的良好。本番用としても候補。");
+
+      return { text: points.join("<br>"), rank: bad ? "bad" : warn ? "warn" : "good" };
+    }
+
+    function render() {
+      const list = document.getElementById("tireList");
+      const analysisList = document.getElementById("analysisList");
+      const historyTire = document.getElementById("historyTire");
+
+      historyTire.innerHTML = "";
+      tires.forEach(t => historyTire.add(new Option(tireName(t), t.id)));
+
+      if (tires.length === 0) {
+        list.innerHTML = `<div class="empty">まだタイヤが登録されていません</div>`;
+        analysisList.innerHTML = `<div class="empty">分析するタイヤがありません</div>`;
+        return;
+      }
+
+      list.innerHTML = tires.map(t => {
+        const a = analyze(t);
+        return `
+          <div class="card">
+            <div class="tire-title">${tireName(t)}</div>
+            <div class="meta">
+              製造：${t.year}年 ${t.week}週<br>
+              残溝：${t.groove} / 保管：${t.storage}<br>
+              状態：${t.condition} / 摩耗：${t.wear}
+            </div>
+            <span class="tag ${a.rank}">${a.rank === "good" ? "良好" : a.rank === "warn" ? "注意" : "危険"}</span>
+            <span class="tag">走行履歴 ${t.histories.length}件</span>
+            <div class="ai-box">${a.text}</div>
+            ${t.histories.slice().reverse().map(h => `
+              <div class="history">
+                <b>${h.date}</b> ${h.car} / ${h.place} / ${h.road}<br>
+                使用：${h.position}　冷間：${h.cold}　温間：${h.hot}　${h.runs}<br>
+                ${h.memo || ""}
+              </div>
+            `).join("")}
+            <div class="actions">
+              <button class="secondary" onclick="deleteTire(${t.id})">削除</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      analysisList.innerHTML = tires.map(t => {
+        const a = analyze(t);
+        return `
+          <div class="card">
+            <div class="tire-title">${tireName(t)}</div>
+            <span class="tag ${a.rank}">${a.rank === "good" ? "本番候補" : a.rank === "warn" ? "練習用候補" : "廃棄候補"}</span>
+            <div class="ai-box">${a.text}</div>
+            <div class="small">※現時点では履歴・残溝・摩耗・保管方法からの簡易AI風診断です。</div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function deleteTire(id) {
+      if (!confirm("このタイヤを削除しますか？")) return;
+      tires = tires.filter(t => t.id !== id);
+      save();
+    }
+
+    function showTab(id) {
+      document.querySelectorAll("section").forEach(s => s.classList.remove("active"));
+      document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+      document.getElementById(id).classList.add("active");
+      event?.target?.classList.add("active");
+      render();
+    }
+
+    fillSelects();
+    render();
+  </script>
+</body>
+</html>
